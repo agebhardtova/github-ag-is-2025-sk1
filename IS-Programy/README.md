@@ -1,3 +1,2 @@
-# IS-Programy
-Tento repozitář obsahuje programy pro předmět IS.
+# github-ag-is-2025-sk1
 
