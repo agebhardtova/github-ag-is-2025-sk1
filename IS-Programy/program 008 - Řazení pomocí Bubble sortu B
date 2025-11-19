@@ -5,7 +5,7 @@ while (again == "a")
 {
     Console.Clear();
     Console.WriteLine("*******************************************");
-    Console.WriteLine("***** Bubble Sort *************************");
+    Console.WriteLine("***** Bubble Sort *****");
     Console.WriteLine("*******************************************");
     Console.WriteLine("*************** Anna Gebhardtová ***************");
     Console.WriteLine("*******************************************");
