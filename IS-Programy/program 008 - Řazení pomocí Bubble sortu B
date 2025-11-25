@@ -5,9 +5,9 @@ while (again == "a")
 {
     Console.Clear();
     Console.WriteLine("*******************************************");
-    Console.WriteLine("***** Bubble Sort *****");
+    Console.WriteLine("**************** Bubble Sort **************");
     Console.WriteLine("*******************************************");
-    Console.WriteLine("*************** Anna Gebhardtová ***************");
+    Console.WriteLine("************* Anna Gebhardtová *************");
     Console.WriteLine("*******************************************");
     Console.WriteLine();
     
@@ -60,10 +60,10 @@ while (again == "a")
 
     int compare = 0;
     int change = 0;
-
-    // Algoritmus Bubble sort
-    myStopwatch.Start();
-    for (int i = 0; i < n - 1; i++)
+ 
+    // Algoritmus Bubble sort 
+    myStopwatch.Start(); 
+    for (int i = 0; i < n - 1; i++)  
     {
         for (int j = 0; j < n - i - 1; j++)
         {
@@ -75,9 +75,9 @@ while (again == "a")
                 myRandNumbs[j] = tmp;
                 change++;
             }
-        }
+        }  
     }
-    myStopwatch.Stop();
+    myStopwatch.Stop(); 
 
     // Výpis seřazených čísel
     Console.WriteLine();
@@ -94,8 +94,36 @@ while (again == "a")
     Console.WriteLine($"Počet výměn: {change}");
     Console.WriteLine("Čas potřebný na seřazení čísel: {0}", myStopwatch.Elapsed);
 
+
+Console.WriteLine("================================");
+
+//výpis proměnných - SecondLargest
+int SecondLargest = myRandNumbs[1]; // Druhé největší číslo v seřazeném poli
+Console.WriteLine($"Druhé největší číslo v poli je: {SecondLargest}"); // Výpis druhého největšího čísla 
+int height = SecondLargest;
+int width = SecondLargest; 
+
+
+// Vytvoření obrazce                    u stringů se používá jenom ' ' místo " " (string funguje jinak, než jen writeline)
+Console.WriteLine(new string('*', width));
+Console.WriteLine(new string('*', width));// Horní okraj obrazce
+
+//prostřed obrazce for cycle  
+for (int i = 0; i < height - 2; i++)
+{
+    Console.WriteLine("*" + new string(' ', width - 2) + "*"); // Levý okraj obrazce
+                        // Vytvoření prostoru uvnitř obrazce 
+                        //největší číslo -2 (pro okraje)
+} 
+
+// Spodní okraj obrazce
+Console.WriteLine(new string('*', width));
+Console.WriteLine(new string('*', width));
+
+
+
     Console.WriteLine();
     Console.WriteLine("Pro opakování programu stiskněte klávesu a.");
-    again = Console.ReadLine();
+    again = Console.ReadLine()??""; // ošetření proti null hodnotě pokud je again not null tak to použije tu hodnotu, jinak prázdný string
 
-}
+} 
