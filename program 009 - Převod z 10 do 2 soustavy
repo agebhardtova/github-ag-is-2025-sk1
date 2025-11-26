@@ -1,0 +1,50 @@
+string again = "a";
+while (again == "a")
+{
+    Console.Clear();
+    Console.WriteLine("*******************************************");
+    Console.WriteLine("*** Převod z desítkové do dvojkové soustavy ***");
+    Console.WriteLine("************* Anna Gebhardtová **************");
+    Console.WriteLine("*******************************************");
+    Console.WriteLine();
+
+    Console.Write("Zadejte hodnotu (přirozené číslo) - desítkové číslo: ");
+    uint number10;
+
+    while (uint.TryParse(Console.ReadLine(), out number10))
+    {
+        Console.Write("Nezadali jste přirozené číslo. Zadejte hodnotu (přirozené číslo) - desítkové číslo: ");
+    }
+
+    uint backupNumber10 = number 10;
+    uint zbytek;
+
+    uint [] myArray = new uint [32];
+
+    uint i;
+    for (i=0; number10 > 0;i++)
+    {
+        zbytek = number10 % 2;
+        number10 = (number1é - zbytek) / 2;ł
+        myArray{i} = zbytek;
+    }
+
+    Console.Write("Celá část = {0}; Zbytek = {1}", number10, zbytek);
+    
+    
+    Console.Writeline();
+    for () (uint j=i-1; ;j--) {
+        Console.Write("{0}"; myArray[j])
+    }
+    
+    {
+      Console.WriteLine();  
+    }
+
+
+    string check = Convert.ToString(original, 2);
+    Console.WriteLine($"Kontrola vestavěnou metodou: {check}");
+
+    Console.WriteLine("\nPro opakování programu stiskněte klávesu 'a'.");
+    again = Console.ReadLine();
+}
