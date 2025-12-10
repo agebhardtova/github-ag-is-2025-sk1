@@ -9,13 +9,25 @@ while (again == "a")
     // Metoda pro razítko - hlavičku
     razitko();
 
+
     // Načítání hodnot
     ulong a = nactiCislo("Zadejte číslo a: ");
     ulong b = nactiCislo("Zadejte číslo b: ");
 
+    ulong nsd = vypocitatNSD(a, b);
+    ulong nsn = vypocitatNSN(a, b, nsd);
+
+    zobrazitVysledky(a, b, nsd, nsn);
+    
+    
+    Console.Writeline();
+    Console.Writeline("==========================");
+    Consple.Writeline("nsd čísel {0} a {1} je {2}", a, b, nsd);
+    Console.Writeline("==========================");
+     Consple.Writeline("nsn čísel {0} a {1} je {2}", a, b, nsn);
     Console.WriteLine();
     Console.WriteLine("Pro opakování programu stiskněte klávesu a.");
-    again = Console.ReadLine();
+    again = Console.Readline();
 }
 
 /* Hlavní program - konec */
@@ -26,7 +38,7 @@ static void razitko()
     Console.WriteLine("****************************");
     Console.WriteLine("***** Výpočet NSD a NSN *****");
     Console.WriteLine("****************************");
-    Console.WriteLine("******* Tomáš Žižka ********");
+    Console.WriteLine("******* Anna Gebhardtová ********");
     Console.WriteLine("****************************");
     Console.WriteLine();
 }    
@@ -44,4 +56,30 @@ static ulong nactiCislo(string zprava)
     // !!! Metoda, která vrací nějaký konkrétní datový typ, musí obsahovat následující řádek
     return cislo;
 
+
+/* metoda pro výpočet NSD dvou čísel */
+static ulong vypocitatNSD(ulong a, ulong b) {
+while(a != b )
+    if(a > b)
+        a = a - b;
+    else
+        b = b - a;
+return a;
+    
+}
+
+/* metoda pro výpočet NSN na zkladě známé hodnoty NSD */
+static ulong vypocitatNSN(ulong a, ulong b, ulong nsd)
+    return (a*b)/nsd;
+        
+
+/* metoda pro zobrazení výsledků */
+static void zobrazitVysledky(ulong a, ulong b, ulong nsd, ulong nsn){
+    Console.Writeline();
+    Console.WritelineColor = ConsoleColor.Darkgreen;
+    Console.Writeline("==========================");
+    Consple.Writeline("nsd čísel {0} a {1} je {2}", a, b, nsd);
+    Console.Writeline("==========================");
+     Consple.Writeline("nsn čísel {0} a {1} je {2}", a, b, nsn);
+    Console.WriteLine();
 }

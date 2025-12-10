@@ -6,7 +6,7 @@ string again = "a";
             Console.WriteLine("*******************************************");
             Console.WriteLine("***** Intervaly *****");
             Console.WriteLine("*******************************************");
-            Console.WriteLine("************* Tomáš Žižka *****************");
+            Console.WriteLine("************* Anna Gebhardtovíá *****************");
             Console.WriteLine("*******************************************");
             Console.WriteLine();
 
