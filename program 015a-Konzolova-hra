@@ -1,0 +1,323 @@
+using System;
+
+class Program
+{
+    // Globální proměnné pro stav hry
+    static char[,] mapa = null!;
+    static int hracX, hracY;
+    static int duchX, duchY;
+    static int sebraneDiamanty;
+    static int celkemDiamantu;
+    static Random rnd = new Random();
+
+    static void Main()
+    {
+        Console.CursorVisible = false; // Skryje blikající kurzor
+        Console.Title = "Lovce Diamantů";
+
+        while (true)
+        {
+            Console.Clear();
+            ZobrazMenu();
+
+            ConsoleKey volba = Console.ReadKey(true).Key;
+
+            if (volba == ConsoleKey.D1 || volba == ConsoleKey.NumPad1)
+            {
+                SpustitHru();
+            }
+            else if (volba == ConsoleKey.D2 || volba == ConsoleKey.NumPad2)
+            {
+                ZobrazInfo();
+            }
+            else if (volba == ConsoleKey.D3 || volba == ConsoleKey.NumPad3 || volba == ConsoleKey.Escape)
+            {
+                break; // Ukončí program
+            }
+        }
+    }
+
+    static void ZobrazMenu()
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("================================");
+        Console.WriteLine(" 💎  LOVCE DIAMANTŮ  💎 ");
+        Console.WriteLine("================================");
+        Console.ResetColor();
+        Console.WriteLine();
+        Console.WriteLine("    [1] Start hry");
+        Console.WriteLine("    [2] Informace a ovládání");
+        Console.WriteLine("    [3] Konec");
+    }
+
+    static void ZobrazInfo()
+    {
+        Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("#########################################");
+        Console.WriteLine("#             JAK HRÁT?                 #");
+        Console.WriteLine("#########################################");
+        Console.WriteLine();
+        Console.WriteLine(" CÍL: Sesbírej všechny diamanty '$'");
+        Console.WriteLine("      Poté utec východem 'E'");
+        Console.WriteLine();
+        Console.WriteLine(" POZOR: Vyhýbej se duchovi 'G'!");
+        Console.WriteLine();
+        Console.WriteLine(" OVLÁDÁNÍ: W, A, S, D nebo Šipky");
+        Console.WriteLine(" ESC: Návrat do menu");
+        Console.WriteLine();
+        Console.WriteLine("#########################################");
+        Console.ResetColor();
+        Console.ReadKey(true);
+    }
+
+    static void SpustitHru()
+    {
+        // Reset hry
+        NactiMapu();
+        
+        while (true)
+        {
+            // 1. Vykreslení
+            Console.SetCursorPosition(0, 0);
+            VykresliMapu();
+            
+            // Info pod mapou
+            Console.WriteLine($"\nDiamanty: {sebraneDiamanty}/{celkemDiamantu}   ");
+            Console.WriteLine("Pohyb: WASD | ESC = Menu");
+
+            // 2. Načtení vstupu
+            if (Console.KeyAvailable)
+            {
+                ConsoleKey key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.Escape) return;
+
+                bool vyhra, prohra;
+                PohybHrace(key, out vyhra, out prohra);
+
+                if (vyhra)
+                {
+                    KonecHry(true);
+                    return;
+                }
+                if (prohra)
+                {
+                    KonecHry(false);
+                    return;
+                }
+            }
+
+            // 3. Pohyb nepřítele (zpomalení, aby nebyl moc rychlý)
+            // Jednoduchý trik: duch se hýbe jen občas nebo po stisku klávesy.
+            // Zde uděláme pohyb ducha po pohybu hráče (viz výše), ale
+            // pokud chceme real-time, museli bychom použít Thread.Sleep.
+            // Pro jednoduchost zachováme tahový systém jako v zadání kamarádky.
+        }
+    }
+
+    static void NactiMapu()
+    {
+        // P = Hráč, . = Prázdno, # = Zeď, $ = Diamant, E = Východ
+        mapa = new char[,]
+        {
+            { '#','#','#','#','#','#','#','#','#','#','#','#','#','#','#' },
+            { '#','P','.','.','$','.','#','.','.','.','$','.','.','.','#' },
+            { '#','.','#','#','#','.','#','.','#','#','#','#','.','#','#' },
+            { '#','.','.','.','.','.','.','.','.','.','.','.','.','$','#' },
+            { '#','$','#','#','#','#','.','#','#','.','#','#','#','.','#' },
+            { '#','.','.','.','.','.','.','$','.','.','.','.','.','.','#' },
+            { '#','.','#','#','#','.','#','#','#','.','#','#','#','.','#' },
+            { '#','.','.','$','.','.','.','.','.','.','.','.','E','.','#' },
+            { '#','#','#','#','#','#','#','#','#','#','#','#','#','#','#' }
+        };
+
+        hracX = 1;
+        hracY = 1;
+        sebraneDiamanty = 0;
+        celkemDiamantu = 0;
+
+        // Spočítáme diamanty na mapě
+        foreach (char c in mapa)
+        {
+            if (c == '$') celkemDiamantu++;
+        }
+
+        SpawnDucha();
+    }
+
+    static void SpawnDucha()
+    {
+        // Najde náhodné místo pro ducha, které není zeď a není hráč
+        int x, y;
+        do
+        {
+            x = rnd.Next(1, mapa.GetLength(1) - 1);
+            y = rnd.Next(1, mapa.GetLength(0) - 1);
+        }
+        while (mapa[y, x] != '.' && mapa[y, x] != '$'); // Duch se nespawne na zdi ani hráči
+
+        duchX = x;
+        duchY = y;
+        // Poznámka: Ducha do pole 'mapa' nezapisujeme natvrdo jako znak,
+        // budeme ho tam jen vykreslovat, aby nepřepsal diamant.
+    }
+
+    static void VykresliMapu()
+    {
+        for (int y = 0; y < mapa.GetLength(0); y++)
+        {
+            for (int x = 0; x < mapa.GetLength(1); x++)
+            {
+                // Priorita vykreslování: Hráč > Duch > Mapa
+                if (x == hracX && y == hracY)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("☻ "); // Znak hráče
+                }
+                else if (x == duchX && y == duchY)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("G "); // Znak ducha (Ghost)
+                }
+                else
+                {
+                    char policko = mapa[y, x];
+                    switch (policko)
+                    {
+                        case '#':
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            Console.Write("██"); // Hezčí zeď
+                            break;
+                        case '$':
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.Write("♦ ");
+                            break;
+                        case 'E':
+                            if (sebraneDiamanty == celkemDiamantu)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.Write("E "); // Otevřený východ
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.Write("X "); // Zavřený východ
+                            }
+                            break;
+                        default:
+                            Console.Write("  ");
+                            break;
+                    }
+                }
+                Console.ResetColor();
+            }
+            Console.WriteLine();
+        }
+    }
+
+    static void PohybHrace(ConsoleKey key, out bool vyhra, out bool prohra)
+    {
+        vyhra = false;
+        prohra = false;
+
+        int noveX = hracX;
+        int noveY = hracY;
+
+        if (key == ConsoleKey.W || key == ConsoleKey.UpArrow) noveY--;
+        if (key == ConsoleKey.S || key == ConsoleKey.DownArrow) noveY++;
+        if (key == ConsoleKey.A || key == ConsoleKey.LeftArrow) noveX--;
+        if (key == ConsoleKey.D || key == ConsoleKey.RightArrow) noveX++;
+
+        // Kolize se zdí
+        if (mapa[noveY, noveX] == '#') return;
+
+        // Kontrola východu
+        if (mapa[noveY, noveX] == 'E')
+        {
+            if (sebraneDiamanty == celkemDiamantu)
+            {
+                vyhra = true;
+                return;
+            }
+            else
+            {
+                // Dveře jsou zamčené
+                return; 
+            }
+        }
+
+        // Posun hráče
+        hracX = noveX;
+        hracY = noveY;
+
+        // Sebrání diamantu
+        if (mapa[hracY, hracX] == '$')
+        {
+            mapa[hracY, hracX] = '.'; // Odstraní diamant z mapy
+            sebraneDiamanty++;
+        }
+
+        // Kontrola kolize s duchem po pohybu hráče
+        if (hracX == duchX && hracY == duchY)
+        {
+            prohra = true;
+            return;
+        }
+
+        // Po tahu hráče hraje duch
+        if (PohybDucha())
+        {
+            prohra = true;
+        }
+    }
+
+    static bool PohybDucha()
+    {
+        // Duch se hýbe náhodně
+        int smer = rnd.Next(4);
+        int noveX = duchX;
+        int noveY = duchY;
+
+        if (smer == 0) noveY--;
+        if (smer == 1) noveY++;
+        if (smer == 2) noveX--;
+        if (smer == 3) noveX++;
+
+        // Duch nemůže do zdi a do východu
+        if (mapa[noveY, noveX] != '#' && mapa[noveY, noveX] != 'E')
+        {
+            duchX = noveX;
+            duchY = noveY;
+        }
+
+        // Pokud duch vstoupil na hráče
+        if (duchX == hracX && duchY == hracY)
+        {
+            return true; // Prohra
+        }
+
+        return false;
+    }
+
+    static void KonecHry(bool vitezstvi)
+    {
+        Console.Clear();
+        if (vitezstvi)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n****************************");
+            Console.WriteLine("     VÍTĚZSTVÍ! UTEKL JSI!    ");
+            Console.WriteLine("****************************");
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\n****************************");
+            Console.WriteLine("    PROHRÁL JSI! DUCH TĚ CHYTIL   ");
+            Console.WriteLine("****************************");
+        }
+        Console.ResetColor();
+        Console.WriteLine("\nStiskni libovolnou klávesu pro návrat do menu...");
+        Console.ReadKey();
+    }
+}
